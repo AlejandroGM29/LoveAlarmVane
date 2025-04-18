@@ -183,7 +183,7 @@ function revisarProximidad() {
         if (nodo.lat != null && nodo.lng != null) {
           const d = haversine(latActual, lngActual, nodo.lat, nodo.lng);
           console.log(`Dist. ${u}→${nombreUsuario}: ${d.toFixed(1)} m`);
-          if (d <= 10) dentroDe5m++;
+          if (d <= 3) dentroDe5m++;
         }
       }
     });
