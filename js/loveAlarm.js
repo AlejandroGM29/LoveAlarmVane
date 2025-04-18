@@ -59,6 +59,7 @@ $(document).ready(() => {
     } else {
       $('#trackerDiv').show();
       $("#divShow").show();
+      //Se agrega esto
       escucharLikesParaMi();
     }
     iniciarGeolocalizacion();
