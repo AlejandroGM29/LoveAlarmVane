@@ -19,21 +19,21 @@ const db = firebase.database();
 /* -------------------------------------------------
  * 2)  Estado global
  * ------------------------------------------------- */
-let nombreUsuario = null; // quien se registra
+let nombreUsuario        = null; // quien se registra
 let latActual = null,
-  lngActual = null; // posición propia
-const ES_ALEX = !!document.getElementById("usersDiv"); // detecta página
+    lngActual = null;            // posición propia
+const ES_ALEX = !!document.getElementById('usersDiv'); // detecta página
 
 /* -------------------------------------------------
  * 3)  Al listo el DOM
  * ------------------------------------------------- */
 $(document).ready(() => {
-  $("#registerBtn").on("click", registrarUsuario);
+  $('#registerBtn').on('click', registrarUsuario);
 
   // Si esta página tiene lista de radios (Alex)
   if (ES_ALEX) {
-    $("#ubicaciones").on(
-      "change",
+    $('#ubicaciones').on(
+      'change',
       'input[name="usuarioSeleccionado"]',
       marcarGustado
     );
@@ -43,28 +43,28 @@ $(document).ready(() => {
 /* -------------------------------------------------
  * 4)  Registro de usuario
  * ------------------------------------------------- */
-function registrarUsuario() {
-  const name = $("#nombreUsuario").val().trim();
-  if (!name) return alert("Ingresa tu nombre");
+function registrarUsuario () {
+  const name = $('#nombreUsuario').val().trim();
+  if (!name) return alert('Ingresa tu nombre');
 
   nombreUsuario = name;
-  sessionStorage.setItem("nombreUsuario", name);
+  sessionStorage.setItem('nombreUsuario', name);
 
   const ref = db.ref(`usuarios/${nombreUsuario}`);
-  ref.once("value", (snap) => {
+  ref.once('value', snap => {
     if (!snap.exists()) {
       ref.set({ lat: null, lng: null, Gustados: {} });
     }
   });
 
-  $("#registerDiv").hide();
+  $('#registerDiv').hide();
   if (ES_ALEX) {
-    $("#usersDiv").show();
+    $('#usersDiv').show();
     cargarUsuariosDisponibles();
   } else {
-    $("#trackerDiv").show();
+    $('#trackerDiv').show();
     $("#divShow").show();
-    escucharLikesParaMi(); // Vane
+    escucharLikesParaMi();          // Vane
   }
 
   iniciarGeolocalizacion();
@@ -73,13 +73,13 @@ function registrarUsuario() {
 /* -------------------------------------------------
  * 5)  Geolocalización contínua
  * ------------------------------------------------- */
-function iniciarGeolocalizacion() {
+function iniciarGeolocalizacion () {
   if (!navigator.geolocation) {
-    alert("Tu navegador no soporta geolocalización");
+    alert('Tu navegador no soporta geolocalización');
     return;
   }
   navigator.geolocation.watchPosition(
-    (pos) => {
+    pos => {
       const { latitude: lat, longitude: lng } = pos.coords;
 
       // Guarda sólo coords (no pisa Gustados)
@@ -88,9 +88,9 @@ function iniciarGeolocalizacion() {
       latActual = lat;
       lngActual = lng;
 
-      if (!ES_ALEX) revisarProximidad(); // sólo Vane necesita distancia
+      if (!ES_ALEX) revisarProximidad();  // sólo Vane necesita distancia
     },
-    (err) => console.error("geo‑err", err),
+    err => console.error('geo‑err', err),
     { enableHighAccuracy: true, maximumAge: 0 }
   );
 }
@@ -98,126 +98,95 @@ function iniciarGeolocalizacion() {
 /* -------------------------------------------------
  * 6‑A)  Lado Alex  – cargar lista y marcar like
  * ------------------------------------------------- */
-function cargarUsuariosDisponibles() {
-  db.ref("usuarios").on("value", (snap) => {
+function cargarUsuariosDisponibles () {
+  db.ref('usuarios').on('value', snap => {
     const todos = snap.val() || {};
-    $("#ubicaciones").empty();
-    Object.keys(todos).forEach((u) => {
-      if (u === nombreUsuario) return; // no te marques a ti
-      $("#ubicaciones").append(`
-          <label>
-            <input type="radio" name="usuarioSeleccionado" value="${u}">
-            ${u}
-          </label>
-        `);
+    $('#ubicaciones').empty();
+    Object.keys(todos).forEach(u => {
+      if (u === nombreUsuario) return;      // no te marques a ti
+      $('#ubicaciones').append(`
+        <label>
+          <input type="radio" name="usuarioSeleccionado" value="${u}">
+          ${u}
+        </label>
+      `);
     });
   });
 }
 
-function marcarGustado() {
+function marcarGustado () {
   const liked = $(this).val(); // usuario elegido
   // Guardamos en NUESTRO nodo:
   //   /usuarios/alex/Gustados/vane = true
   db.ref(`usuarios/${nombreUsuario}/Gustados/${liked}`)
     .set(true)
     .then(() => console.log(`Like guardado → ${liked}`))
-    .catch((err) => console.error("like‑err", err));
+    .catch(err => console.error('like‑err', err));
 }
 
 /* -------------------------------------------------
  * 6‑B)  Lado Vane – escuchar quién la ha marcado
  * ------------------------------------------------- */
-function escucharLikesParaMi() {
+function escucharLikesParaMi () {
   // Cada cambio en /usuarios dispara revisión
-  db.ref("usuarios").on("value", () => revisarProximidad());
+  db.ref('usuarios').on('value', () => revisarProximidad());
 }
 
 /* -------------------------------------------------
  * 7)  Revisar distancia de cada “gustador”
  * ------------------------------------------------- */
-function revisarProximidad() {
+function revisarProximidad () {
   if (latActual === null) return; // aún no tengo coordenadas
 
-  db.ref("usuarios")
-    .once("value")
-    .then((snap) => {
-      const todos = snap.val() || {};
-      let dentroDe5m = 0;
+  db.ref('usuarios').once('value').then(snap => {
+    const todos = snap.val() || {};
+    let dentroDe5m = 0;
 
-      Object.keys(todos).forEach((u) => {
-        if (u === nombreUsuario) return; // saltar a mí misma
-        const nodo = todos[u];
+    Object.keys(todos).forEach(u => {
+      if (u === nombreUsuario) return;         // saltar a mí misma
+      const nodo = todos[u];
 
-        // ¿Ese usuario me tiene en “Gustados”?
-        if (nodo.Gustados && nodo.Gustados[nombreUsuario]) {
-          if (nodo.lat != null && nodo.lng != null) {
-            const d = haversine(latActual, lngActual, nodo.lat, nodo.lng);
-            console.log(`Dist. ${u} → ${nombreUsuario}: ${d.toFixed(1)} m`);
-            if (d <= 1) dentroDe5m++;
-          }
+      // ¿Ese usuario me tiene en “Gustados”?
+      if (nodo.Gustados && nodo.Gustados[nombreUsuario]) {
+        if (nodo.lat != null && nodo.lng != null) {
+          const d = haversine(latActual, lngActual, nodo.lat, nodo.lng);
+          console.log(`Dist. ${u} → ${nombreUsuario}: ${(d).toFixed(1)} m`);
+          if (d <= 1) dentroDe5m++;
         }
-      });
-
-      actualizarCírculo(dentroDe5m);
+      }
     });
-}
-function beep(duration = 100, freq = 440, vol = 0.1) {
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const o = ctx.createOscillator();
-  const g = ctx.createGain();
-  o.connect(g);
-  g.connect(ctx.destination);
-  o.frequency.value = freq;
-  g.gain.value = vol;
-  o.start();
-  setTimeout(() => {
-    o.stop();
-    ctx.close();
-  }, duration);
+
+    actualizarCírculo(dentroDe5m);
+  });
 }
 
 /* -------------------------------------------------
  * 8)  UI: actualiza círculo
  * ------------------------------------------------- */
-// justo al principio de loveAlarm.js
-let _lastCount = 0;
-
-function actualizarCírculo(n) {
-  const $c = $("#cantidadPersonas");
-  if (!$c.length) return;
+function actualizarCírculo (n) {
+  const orig = window.updatePersonCount;
+  const $c = $('#cantidadPersonas');
+  if (!$c.length) return;         // Alex no tiene círculo
 
   $c.text(n);
-
-  // Sólo beep cuando pasa de 0 a ≥1
-  if (_lastCount === 0 && n > 0) {
-    beep(120, 600, 0.05);
+  if (n>0 && !$c.find('.orbit1').length) {
+    $c.append('<div class="orbit orbit1"></div><div class="orbit orbit2"></div>');
   }
-  _lastCount = n;
-
-  // Aquí mantienes tu lógica de cometas/SVG…
-  if (n > 0 && !$c.find(".orbit1").length) {
-    $c.append(
-      '<div class="orbit orbit1"></div><div class="orbit orbit2"></div>'
-    );
-  }
-  if (n === 0) {
-    $c.find(".orbit").remove();
-  }
-  // parche SVG:
-  const svg = document.getElementById("orbitSvg");
-  if (svg) svg.style.display = n > 0 ? "block" : "none";
+  if (n===0) $c.find('.orbit').remove();
+  orig && orig(n);
+  document.getElementById('orbitSvg').style.display = n>0 ? 'block':'none';
 }
 
 /* -------------------------------------------------
  * 9)  Distancia Haversine (m)
  * ------------------------------------------------- */
-function haversine(lat1, lon1, lat2, lon2) {
+function haversine (lat1,lon1,lat2,lon2) {
   const R = 6371e3;
-  const φ1 = (lat1 * Math.PI) / 180,
-    φ2 = (lat2 * Math.PI) / 180,
-    dφ = ((lat2 - lat1) * Math.PI) / 180,
-    dλ = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(dλ / 2) ** 2;
-  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const φ1 = lat1*Math.PI/180, φ2 = lat2*Math.PI/180,
+        dφ = (lat2-lat1)*Math.PI/180,
+        dλ = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dφ/2)**2 +
+            Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;
+  return 2*R*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
+
