@@ -1,0 +1,264 @@
+<!-- vane.html – “quién me gusta cerca” con orbitas SVG sincronizadas -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Love Alarm – Vane</title>
+
+    <link rel="stylesheet" href="../css/styles.css" />
+
+    <style>
+      /* círculo contador */
+      #cantidadPersonas {
+        width: 200px;
+        height: 200px;
+        backdrop-filter: blur(2px); /* Desenfoque de fondo */
+        border-radius: 50%;
+        /* background: #8B008B;   */ /* rosa oscuro */
+        color: #fff;
+        font-size: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 0 0 20px rgba(139, 0, 139, 0.6);
+        transition: background 0.3s;
+
+        background: rgba(255, 255, 255, 0.1); /* Fondo transparente */
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        /* background: #8b008b; */
+        color: #fff;
+        font-size: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        margin: 20px auto;
+        box-shadow: 0 0 20px rgba(139, 0, 139, 0.6);
+      }
+      @keyframes pulse-shadow {
+        0% {
+          box-shadow: 0 0 20px rgba(139, 0, 139, 0.6);
+        }
+        50% {
+          box-shadow: 0 0 40px rgba(139, 0, 139, 0.6);
+        }
+        100% {
+          box-shadow: 0 0 20px rgba(139, 0, 139, 0.6);
+        }
+      }
+
+      /* 2) Aplica esa animación únicamente a la sombra del círculo */
+      #cantidadPersonas {
+        /* tus estilos existentes… */
+        box-shadow: 0 0 20px rgba(139, 0, 139, 0.6);
+        animation: pulse-shadow 3s ease-in-out infinite;
+      }
+      /* oculta SVG hasta que haya ≥1 */
+      #orbitSvg {
+        display: none;
+        pointer-events: none;
+      }
+      .form-container input {
+        width: 80%;
+        padding: 8px;
+        margin: 8px 0;
+        font-size: 1rem;
+      }
+      .form-container button {
+        padding: 8px 16px;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  </head>
+  <body>
+    <div class="sky">
+      <div class="moon"></div>
+      <div id="stars"></div>
+      <div id="shooting-stars"></div>
+      <div id="fireworks-container"></div>
+    </div>
+
+    <div class="golden-card">
+      <div id="registerDiv" class="form-container">
+        <input id="nombreUsuario" type="text" placeholder="Tu nombre" />
+        <button id="registerBtn">Iniciar</button>
+      </div>
+      <div id="divShow" style="display: none;">
+        <h3 style="margin-bottom: 50px">En un radio de 5 metros</h3>
+        <div id="trackerDiv" style="display: none; position: relative">
+          <div id="cantidadPersonas">0</div>
+
+          <!-- SVG órbita + dos cometas con cola curva -->
+          <svg
+            id="orbitSvg"
+            viewBox="-130 -130 260 260"
+            width="260"
+            height="260"
+            style="
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+            "
+          >
+            <defs>
+              <!-- define la órbita circular -->
+              <path
+                id="orbitPath"
+                d="M110 0 A110 110 0 1 0 -110 0 A110 110 0 1 0 110 0"
+              />
+              <!-- degradado para la cola -->
+              <linearGradient id="tailGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#ff5ac8" stop-opacity="1" />
+                <stop offset="100%" stop-color="#ff5ac8" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+
+            <!-- ===== cometa 1 ===== -->
+            <use
+              href="#orbitPath"
+              stroke="url(#tailGrad)"
+              stroke-width="10"
+              stroke-linecap="round"
+              fill="none"
+              stroke-dasharray="90 600"
+            >
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from="0 0 0"
+                to="360 0 0"
+                dur="4s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="stroke-width"
+                values="10;2;10"
+                keyTimes="0;0.5;1"
+                dur="4s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="opacity"
+                values="1;0.3;1"
+                keyTimes="0;0.5;1"
+                dur="4s"
+                repeatCount="indefinite"
+              />
+            </use>
+            <circle cx="110" cy="0" r="8" fill="#ff5ac8">
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from="0 0 0"
+                to="360 0 0"
+                dur="4s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="r"
+                values="8;4;8"
+                keyTimes="0;0.5;1"
+                dur="4s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="opacity"
+                values="1;0.3;1"
+                keyTimes="0;0.5;1"
+                dur="4s"
+                repeatCount="indefinite"
+              />
+            </circle>
+
+            <!-- ===== cometa 2 (180° desfasado) ===== -->
+            <use
+              href="#orbitPath"
+              stroke="url(#tailGrad)"
+              stroke-width="10"
+              stroke-linecap="round"
+              fill="none"
+              stroke-dasharray="90 600"
+            >
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from="0 0 0"
+                to="360 0 0"
+                dur="4s"
+                repeatCount="indefinite"
+                begin="-2s"
+              />
+              <animate
+                attributeName="stroke-width"
+                values="10;2;10"
+                keyTimes="0;0.5;1"
+                dur="4s"
+                repeatCount="indefinite"
+                begin="-2s"
+              />
+              <animate
+                attributeName="opacity"
+                values="1;0.3;1"
+                keyTimes="0;0.5;1"
+                dur="4s"
+                repeatCount="indefinite"
+                begin="-2s"
+              />
+            </use>
+            <circle cx="110" cy="0" r="8" fill="#ff5ac8">
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from="0 0 0"
+                to="360 0 0"
+                dur="4s"
+                repeatCount="indefinite"
+                begin="-2s"
+              />
+              <animate
+                attributeName="r"
+                values="8;4;8"
+                keyTimes="0;0.5;1"
+                dur="4s"
+                repeatCount="indefinite"
+                begin="-2s"
+              />
+              <animate
+                attributeName="opacity"
+                values="1;0.3;1"
+                keyTimes="0;0.5;1"
+                dur="4s"
+                repeatCount="indefinite"
+                begin="-2s"
+              />
+            </circle>
+          </svg>
+        </div>
+        <h3 style="margin-top: 55px">Persona/s estan enamorado/as de ti</h3>
+      </div>
+    </div>
+
+    <script src="../js/index.js"></script>
+    <script src="../js/loveAlarm.js"></script>
+    <!-- <script>
+    // parche: muestra/oculta el SVG según el contador
+    (function(){
+      const orig = window.updatePersonCount;
+      window.updatePersonCount = function(n){
+        orig && orig(n);
+        document.getElementById('orbitSvg').style.display = n>0 ? 'block' : 'none';
+      };
+    })();
+  </script> -->
+  </body>
+</html>

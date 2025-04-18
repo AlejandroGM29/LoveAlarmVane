@@ -1,0 +1,64 @@
+<!-- alex.html  –  Pantalla “marcar a quién te gusta” -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Love Alarm – Alex</title>
+
+  <!-- Fondo animado, luna, estrellas… -->
+  <link rel="stylesheet" href="../css/styles.css" />
+
+  <style>
+    /* Tarjeta dorada centrada */
+    /* body, html { margin:0; padding:0; height:100%; overflow:hidden; }
+    .sky      { position:absolute; width:100%; height:100%; z-index:0; }
+    .golden-card{
+      position:relative; z-index:1;
+      background:rgba(255,215,0,.1);
+      border:2px solid gold; border-radius:8px;
+      padding:20px; max-width:350px; margin:auto;
+      top:50%; transform:translateY(-50%);
+      text-align:center;
+    } */
+    .form-container input{ width:80%; padding:8px; margin:8px 0; font-size:1rem; }
+    .form-container button{ padding:8px 16px; font-size:1rem; cursor:pointer; }
+    #ubicaciones label{ display:block; margin:6px 0; cursor:pointer; }
+  </style>
+
+  <!-- jQuery + Firebase (v8) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+
+<body>
+  <!-- Fondo estrellado (estilos/JS en index.js) -->
+  <div class="sky">
+    <div class="moon"></div>
+    <div id="stars"></div>
+    <div id="shooting-stars"></div>
+    <div id="fireworks-container"></div>
+  </div>
+
+  <!-- Tarjeta principal -->
+  <div class="golden-card">
+    <!-- Registro de usuario -->
+    <div id="registerDiv" class="form-container">
+      <input id="nombreUsuario" type="text" placeholder="Tu nombre" />
+      <button id="registerBtn">Iniciar</button>
+    </div>
+
+    <!-- Lista de usuarios para marcar “gustado” -->
+    <div id="usersDiv" style="display:none;">
+      <h3>¿A quién te gusta?</h3>
+      <div id="ubicaciones"></div>
+    </div>
+  </div>
+
+  <!-- Animación del cielo (estrellas, fuegos…) -->
+  <script src="../js/index.js"></script>
+  <!-- Lógica Love Alarm (misma para Alex y Vane) -->
+  <script src="../js/loveAlarm.js"></script>
+</body>
+</html>

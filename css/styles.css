@@ -1,0 +1,220 @@
+/* Estilos básicos del cuerpo */
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: black;
+  font-family: "Arial", sans-serif;
+}
+
+/* Cielo estrellado */
+.sky {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+  overflow: hidden;
+}
+
+/* Luna */
+.moon {
+  position: absolute;
+  top: 10%;
+  right: 15%;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle at 40% 40%, #fefcea, #d4cdb5);
+  border-radius: 50%;
+  box-shadow: 0 0 50px 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Estrellas */
+#stars,
+#shooting-stars,
+#fireworks-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.star {
+  position: absolute;
+  background-color: white;
+  border-radius: 50%;
+  opacity: 0.7;
+  box-shadow: 0 0 6px 2px white;
+  animation: twinkle 5s infinite ease-in-out alternate;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Recuadro dorado */
+.golden-card {
+  position: absolute;
+  top: 50%; /* Ajustamos el recuadro al centro de la pantalla */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.1); /* Fondo transparente */
+  backdrop-filter: blur(2px); /* Desenfoque de fondo */
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.6); /* Bordes dorados difuminados */
+  width: 300px;
+  text-align: center;
+  color: white;
+  height: 80%;
+}
+
+/* Imagen tipo pin */
+.pinned-image {
+  position: absolute;
+  top: 10px; /* Ajuste más preciso para sobresalir del borde */
+  left: 25px; /* Centrado en la esquina */
+  transform: rotate(45deg);
+  z-index: 10;
+}
+
+.pinned-image img {
+  width: 50px;
+  height: auto;
+  border-radius: 50%; /* Sin borde */
+  box-shadow: none; /* Eliminar sombra */
+}
+
+/* Video */
+#video {
+  width: 90%; /* Ajuste del tamaño del reproductor */
+  height: auto;
+  border: none;
+  border-radius: 10px;
+  margin-top: 30px;
+}
+
+/* Caja de texto */
+.card-text {
+  margin-top: 15px;
+  font-size: 14px; /* Ajuste del tamaño del texto */
+  color: white;
+  text-align: center;
+  line-height: 1.5;
+  padding: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Estrellas fugaces */
+.shooting-star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: 0 0 50px 10px white, 0 0 100px 20px rgba(255, 255, 255, 0.5);
+  transform: rotate(45deg);
+  opacity: 0;
+}
+
+@keyframes shooting {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+    box-shadow: 0 0 50px 10px white, 0 0 100px 20px rgba(255, 255, 255, 0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(200px, -200px) scale(0.5);
+    box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.2);
+  }
+}
+/* Fuegos Artificiales */
+#fireworks-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.firework {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: transparent;
+  animation: particle-explode 1s ease-out forwards;
+}
+
+@keyframes particle-explode {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Estrellas fugaces */
+.shooting-star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: 0 0 50px 10px white, 0 0 100px 20px rgba(255, 255, 255, 0.5);
+  transform: rotate(45deg);
+  opacity: 0;
+  animation: shooting 1.5s ease-out forwards;
+}
+
+@keyframes shooting {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+    box-shadow: 0 0 50px 10px white, 0 0 100px 20px rgba(255, 255, 255, 0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(200px, -200px) scale(0.5);
+    box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Contenedores (ajusta márgenes / ancho como necesites) */
+.form-container {
+  text-align: center;
+  margin-top: 50px;
+}
+.tracker-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  animation: pulse 3s infinite ease-in-out; /* Animación para el efecto */
+}
+
+/* Círculo central */
+#cantidadPersonas.circle {
+  width: 200px;
+  height: 200px;
+  backdrop-filter: blur(2px); /* Desenfoque de fondo */
+  border-radius: 50%;
+  /* background: #8B008B;   */ /* rosa oscuro */
+  color: #fff;
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 0 20px rgba(139, 0, 139, 0.6);
+  transition: background 0.3s;
+  animation: pulse 3s infinite ease-in-out; /* Animación para el efecto */
+  background: rgba(255, 255, 255, 0.1); /* Fondo transparente */
+}
